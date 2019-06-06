@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <mvc:annotation-driven/>
+    <mvc:default-servlet-handler/>
+    <context:component-scan base-package="cn.hz.fcloud.controller,cn.hz.fcloud.websocket"/>
+    <!-- Velocity视图解析器    默认视图  -->
+    <bean class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
+        <property name="contentType" value="text/html;charset=UTF-8" />
+        <property name="toolboxConfigLocation" value="/WEB-INF/velocity-toolbox.xml" />
+        <property name="layoutUrl" value="layout/layout.vm"/>
+        <property name="suffix" value=".vm"/>
+        <property name="dateToolAttribute" value="date" />
+        <property name="numberToolAttribute" value="number" />
+        <property name="requestContextAttribute" value="rc"/>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath" value="/WEB-INF/page/" />
+        <property name="velocityProperties">
+            <props>
+                <prop key="input.encoding">UTF-8</prop>
+                <prop key="output.encoding">UTF-8</prop>
+                <prop key="contentType">text/html;charset=UTF-8</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding">
+            <value>UTF-8</value>
+        </property>
+        <property name="maxUploadSize">
+            <!-- 上传文件大小限制为5M，5*1024*1024 -->
+            <value>2542880</value>
+        </property>
+    </bean>
+
+    <!--Start druid开启spring的监控 需要引入aspectjweaver包-->
+    <!--p:filters="stat,wall,log4j"   stat和wall。一个是用于监控，一个是用于防火墙。如果想使用sql防火墙，必须加上wall-->
+    <!--druid spring monitor setting-->
+    <bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor" />
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
+        <property name="patterns">
+            <list>
+                <!-- 配置监听的bean路径 支持方法名的拦截 -->
+                <value>cn.hz.fcloud.service.*</value>
+                <value>cn.hz.fcloud.dao.*</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 基于AspectJ的自动代理.使用AnnotationAwareAspectJAutoProxyCreator  -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor"
+                     pointcut-ref="druid-stat-pointcut" />
+        <!-- pointcut-ref="druid-stat-pointcut"在idea中报Cannot resolve Spring Pointcut 'druid-stat-pointcut'  不用管它 -->
+    </aop:config>
+    <!--End druid开启spring的监控 -->
+</beans>

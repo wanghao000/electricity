@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hz.fcloud.dao.EquipmentMapper">
+    <select id="findAll" resultType="cn.hz.fcloud.entity.Equipment">
+        select * from equipment
+    </select>
+    <select id="findOne" parameterType="string" resultType="cn.hz.fcloud.entity.Equipment">
+        select * from equipment where code=#{code}
+    </select>
+    <insert id="addEquipment" parameterType="cn.hz.fcloud.entity.Equipment">
+        insert into equipment values(#{id,jdbcType=BIGINT}, #{code}, #{name}, #{type}, #{province}, #{city}, #{district}, #{address}, #{lng}, #{lat}, #{createUser}, 0, #{lastReportTime}, #{createTime}, #{isDelete}, #{companyId}, #{remark})
+    </insert>
+	<update id="delEquipment" parameterType="String">
+        update equipment set is_delete=0 where code=#{code}
+    </update>
+    <update id="modifyState">
+        update equipment set is_delete=#{isDelete} where code=#{code}
+    </update>
+    <update id="updateReportTimeAndOnline" parameterType="cn.hz.fcloud.entity.Equipment">
+        update equipment set is_online=#{isOnline}
+        <if test="lastReportTime != null">
+            ,last_report_time=#{lastReportTime}
+        </if>
+        where code=#{code}
+    </update>
+    <select id="lineCount" resultType="int">
+        select count(*) from equipment where is_online = 0
+    </select>
+    <select id="countAll" resultType="int">
+        select count(*) from equipment
+    </select>
+    <select id="selectByCompanyId" resultType="cn.hz.fcloud.entity.Equipment">
+        select * from equipment where company_id = #{value}
+    </select>
+    <select id="test" resultType="cn.hz.fcloud.entity.Equipment">
+        SELECT e.*,d.* FROM equipment e
+		LEFT JOIN equipment_data d ON e.code=d.code
+    </select>
+    <update id="updateEq" parameterType="cn.hz.fcloud.entity.Equipment">
+        update equipment
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="createUser != null">
+                create_user = #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where code=#{code}
+    </update>
+	<select id="findTypeAndCount" resultType="map">
+		select type,count(type) ct from equipment group by type
+	</select>
+    <select id="findTypeAndCountByUser" parameterType="long" resultType="map">
+		select type,company_id,count(type) ct from equipment e left join (select c.id from (select provider_id from sys_user where type=2 and id=#{userId})p left join company c on p.provider_id=c.provider_id)a on e.company_id=a.id group by type
+	</select>
+    <select id="findCompanyAndCount" resultType="map">
+        select c.name,count(c.id) ci from equipment e left join company c on e.company_id=c.id where c.name is not null group by c.id
+    </select>
+    <select id="findCompanyAndCountByUser" parameterType="long" resultType="map">
+        select b.name,count(b.id) ci from equipment e right join (select c.id,c.name from company c right join (select p.id from sys_user u left join provider p on u.provider_id=p.id where u.id=#{userId}) a on c.provider_id=a.id) b on e.company_id=b.id group by b.id
+    </select>
+</mapper>

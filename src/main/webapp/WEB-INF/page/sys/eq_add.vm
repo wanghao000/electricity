@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 基本表单</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link href="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/font-awesome.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/style.css" rel="stylesheet">
+    <!-- Sweet Alert -->
+    <link href="$rc.contextPath/statics/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <style>
+        .modal-dialog{
+            width: 900px;
+            height: 500px;
+        }
+        #container{
+            width: 850px;
+            height: 400px;
+        }
+        .amap-sug-result {
+            z-index: 4096;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>设备添加</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" onsubmit="return false;">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <h5>设备类型<span class="glyphicon glyphicon-plus" title="点击添加设备类型" onclick="addType()" style="margin-left: 10px;"></span></h5>
+                                <select class="form-control m-b" name="type" id="type">
+                                    <option value="-1">请选择</option>
+##                                    <option value="0">烟感</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <h5>所属企业</h5>
+                                <select class="form-control m-b" name="companyId" id="companyId">
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <h5  style="visibility:hidden;">隐藏</h5>
+                                <a class="btn btn-primary btn-sm" onclick="show_modal()">点击获取经纬度信息</a>
+                            </div>
+                        </div>
+                        <h5>所在地址</h5>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <select name="province" class="form-control m-b" id="province">
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select name="city" class="form-control m-b" id="city">
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select name="district" id="district" class="form-control m-b" id="district">
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>设备名称</h5>
+                                <input type="text" class="form-control" id="name">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>设备编号</h5>
+                                <input type="text" class="form-control" id="code">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>设备地址</h5>
+                                <input type="text" class="form-control" id="address">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>备注</h5>
+                                <input type="text" class="form-control" id="remark">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>经度</h5>
+                                <input type="text" class="form-control" id="lng" readonly>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>纬度</h5>
+                                <input type="text" class="form-control" id="lat" readonly>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-5">
+                                <button class="btn btn-primary" id="save">保存</button>
+                                <button class="btn btn-white" onclick="history.go(-1)">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="addView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        添加设备类型
+                    </h4>
+                </div>
+                <div class="modal-body" style="height: 200px">
+                    <div class="layui-input-block">
+                            <div class="col-sm-12">
+                                <h5>设备类型</h5>
+                                <input type="text" class="form-control" id="typeName">
+                            </div>
+                            <div class="col-sm-12">
+                                <h5>备注</h5>
+                                <input type="textarea" class="form-control" id="typeRemark">
+                            </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="saveType()">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        选取设备经纬度
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="layui-input-block">
+                        <div id="myPageTop">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label>按关键字搜索：</label>
+                                    </td>
+                                    <td class="column2">
+                                        <label>左击获取经纬度：</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="text" id="tipinput" autocomplete="off" onkeydown="if(event.keyCode==13)return false;" placeholder="请输入关键字进行搜索" >
+                                    </td>
+                                    <td class="column2">
+                                        <input type="text"  readonly="true" id="lnglat" name="lnglat" >
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="container"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="$rc.contextPath/statics/js/jquery.min.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.js"></script>
+
+<!-- iCheck -->
+<script src="$rc.contextPath/statics/plugins/iCheck/icheck.min.js"></script>
+<!-- Sweet alert -->
+<script src="$rc.contextPath/statics/plugins/sweetalert/sweetalert.min.js"></script>
+<!--  高德地图 -->
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.9&key=cb8ee286c814c0c8e629b1d21cc3d89c"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.9&key=cb8ee286c814c0c8e629b1d21cc3d89c&plugin=AMap.Autocomplete"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.9&key=cb8ee286c814c0c8e629b1d21cc3d89c&plugin=AMap.Autocomplete&plugin=AMap.Geocoder"></script>
+<script src="$rc.contextPath/statics/js/map.js"></script>
+<script>
+    $("#save").click(function () {
+        var data = {
+            name : $("#name").val(),
+            code : $("#code").val(),
+            companyId:$("#companyId").val(),
+            address : $("#address").val(),
+            remark : $("#remark").val(),
+            type:$("#type option:checked").val(),
+            province:$("#province option:checked").val(),
+            city:$("#city option:checked").val(),
+            district:$("#district option:checked").val(),
+            lng:$("#lng").val(),
+            lat:$("#lat").val()
+        };
+        if(data.type == -1){
+            swal("错误", "请选择设备类型", "error");
+            return;
+        }
+        if(data.companyId == -1){
+            swal("错误", "请选择所属企业", "error");
+            return;
+        }
+        if(data.district == -1){
+            swal("错误", "请选择完整的省市县地址", "error");
+            return;
+        }
+        if(data.code == null){
+            swal("错误", "请输入设备编号", "error");
+            return;
+        }
+        jQuery.ajax({
+            type: "POST",
+            url: "$rc.contextPath/sys/eq/save",
+            data: JSON.stringify(data),
+            dataType: "json",
+            contentType:"application/json;charset=UTF-8",
+            success: function(result){
+                if(result.code == 0){//返回成功
+                    history.go(-1);
+                }else{
+                    swal("错误",result.msg,"error" );
+                }
+            }
+        });
+    });
+       $(function () {
+           $('.i-checks').iCheck({
+               checkboxClass: 'icheckbox_square-green',
+               radioClass: 'iradio_square-green',
+           });
+           //加载类型
+           url = "$rc.contextPath/sys/type/list"
+           jQuery.post(url,function (pdata) {
+               var html = "";
+               jQuery.each(pdata,function(idx,item){
+                   html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+               });
+               $("#type").append(html);
+           })
+           //加载公司
+           url = "$rc.contextPath/sys/eq/companyList"
+           jQuery.post(url,function (pdata) {
+               var html = "";
+               jQuery.each(pdata,function(idx,item){
+                   html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+               });
+               $("#companyId").append(html);
+           })
+           //省市县三级联动
+            var url = "$rc.contextPath/sys/china/show/";
+           jQuery.post(url+"100000",function (pdata) {
+               var html = "";
+               jQuery.each(pdata,function(idx,item){
+                   html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+               });
+               $("#province").append(html);
+           })
+
+           $("#province").change(function(){
+               ## url = "$rc.contextPath/sys/china/show/";
+               ## if ($(this).val() == "") return;
+               ## $("#city option").remove();
+               ## $("#district option").remove();
+               ## var html = "<option value='-1'>请选择</option>";
+               ## // $("#city").append(html);
+               ## $("#district").append(html);
+               ## var code = $(this).find("option:selected").attr("exid");
+               ## url+=code;
+               ## jQuery.post(url,function (pdata) {
+               ##     jQuery.each(pdata,function(idx,item){
+               ##         html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+               ##     });
+               ##     $("#city").append(html);
+               ## })
+               provinceChange();
+           });
+           $("#city").change(function(){
+               ## url = "$rc.contextPath/sys/china/show/";
+               ## if ($(this).val() == "") return;
+               ## $("#district option").remove();
+               ## var code = $(this).find("option:selected").attr("exid");
+               ## var html = "<option value='-1'>请选择</option>";
+               ## url += code;
+               ## jQuery.post(url,function (pdata) {
+               ##     jQuery.each(pdata,function(idx,item){
+               ##         html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+               ##     });
+               ##     $("#district").append(html);
+               ## });
+               cityChange();
+           });
+
+       });
+    function show_modal(){
+        $('#myModal').modal('show');
+        position();
+    }
+    function addType(){
+        $('#addView').modal('show');
+    }
+    function saveType() {
+        var data = {
+            name : $("#typeName").val(),
+            remark : $("#typeRemark").val(),
+        };
+        jQuery.ajax(
+                {
+                    type:"POST",
+                    url: "$rc.contextPath/sys/type/save",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType:"application/json;charset=UTF-8",
+                    success: function(result){
+                        if(result.code == 0){
+                            swal("成功","添加类型成功!","success");
+                            //加载类型
+                            $("#type").html("<option value='-1'>请选择</option>");
+                            url = "$rc.contextPath/sys/type/list"
+                            jQuery.post(url,function (pdata) {
+                                var html = "";
+                                jQuery.each(pdata,function(idx,item){
+                                    html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+                                });
+                                $("#type").append(html);
+                            })
+                        }else{
+                            swal("错误","添加类型失败!","error");
+                        }
+                    }
+                }
+        )
+        $('#addView').modal('hide');
+    }
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - 基本表单</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link href="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/font-awesome.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/style.css" rel="stylesheet">
+    <!-- Sweet Alert -->
+    <link href="$rc.contextPath/statics/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>服务商修改</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" onsubmit="return false;">
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>服务商名称</h5>
+                                <input type="text" class="form-control" id="name">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>客服电话</h5>
+                                <input type="text" class="form-control" id="serviceTel">
+                            </div>
+                        </div>
+                        <h5>所在地址</h5>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <select name="province" class="form-control m-b" id="province" readonly>
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select name="city" class="form-control m-b" id="city" readonly>
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select name="district" id="district" class="form-control m-b" id="district" readonly>
+                                    <option value="-1">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>联系人</h5>
+                                <input type="text" class="form-control" id="contacts">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>联系人电话</h5>
+                                <input type="text" class="form-control" id="contactsPhone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h5>详细地址</h5>
+                                <input type="text" class="form-control" id="address">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5>备注</h5>
+                                <input type="email" class="form-control" id="remark">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-5">
+                                <button class="btn btn-primary" id="save">保存</button>
+                                <button class="btn btn-white" onclick="history.go(-1)">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="$rc.contextPath/statics/js/jquery.min.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.js"></script>
+
+<!-- iCheck -->
+<script src="$rc.contextPath/statics/plugins/iCheck/icheck.min.js"></script>
+<!-- Sweet alert -->
+<script src="$rc.contextPath/statics/plugins/sweetalert/sweetalert.min.js"></script>
+<script>
+    $("#save").click(function () {
+        var id = window.location.search.split('=')[1];
+        var data = {
+            id:id,
+            name : $("#name").val(),
+            serviceTel : $("#serviceTel").val(),
+            address : $("#address").val(),
+            remark : $("#remark").val(),
+            province:$("#province option:checked").val(),
+            city:$("#city option:checked").val(),
+            district:$("#district option:checked").val(),
+            contacts:$("#contacts").val(),
+            contactsPhone:$("#contactsPhone").val(),
+        };
+        jQuery.ajax({
+            type: "POST",
+            url: "$rc.contextPath/sys/provider/update",
+            data: JSON.stringify(data),
+            dataType: "json",
+            contentType:"application/json;charset=UTF-8",
+            success: function(result){
+                if(result.code == 0){//返回成功
+                    history.go(-1);
+                }else{
+                    swal("错误",result.msg,"error" );
+                }
+            }
+        });
+    });
+    $(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        var id = window.location.search.split('=')[1];
+        //加载公司
+        url = '$rc.contextPath/sys/eq/companyList';
+        jQuery.ajax({
+            url:url,
+            async:false,
+            success:function (pdata) {
+                var html = "";
+                jQuery.each(pdata,function(idx,item){
+                    html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+                });
+                $("#companyId").append(html);
+            }
+        })
+        url = '$rc.contextPath/sys/provider/find/'+id;
+        jQuery.ajax({
+            url:url,
+            async:false,
+            success:function (pdata) {
+                var html = "";
+                jQuery.each(pdata,function(idx,item){
+                    if("province" == idx){
+                        html += "<option value='" + item+ "' selected>" + pdata.pName + "</option>";
+                        $("#province").html(html);
+                    }else if("city" == idx){
+                        html = "";
+                        html += "<option value='" + item+ "' selected>" + pdata.cName + "</option>";
+                        $("#city").html(html);
+                    }else if("district" == idx){
+                        html = "";
+                        html += "<option value='" + item+ "' selected>" + pdata.dName + "</option>";
+                        $("#district").html(html);
+                    }else{
+                        $("#"+idx).val(item);
+                    }
+                });
+            }
+        })
+    });
+</script>
+
+
+</body>
+
+</html>

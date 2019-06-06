@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - Bootstrap Table</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+     <link href="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/plugins/bootstrap-table/css/bootstrap-table.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/style.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Sweet Alert -->
+    <link href="$rc.contextPath/statics/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>查询</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label">用户名</label>
+                        <input type="text" id="username" class="form-control" maxlength="40" placeholder="用户名">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label">姓名</label>
+                        <input type="text" id="nickname" class="form-control" maxlength="40" placeholder="姓名">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label">用户类别</label>
+                        <select class="form-control" id="type">
+                            <option value="">请选择</option>
+                            <option value="1">运维用户</option>
+                            <option value="2">服务商用户</option>
+                            <option value="3">企业用户</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label">所属企业</label>
+                        <select class="form-control" id="company">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" onclick="Query()" class="btn btn-primary" style="margin-top: 25px !important;">
+                        <i class="fa fa-search"></i>
+                        搜索
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div id="toolbar" class="btn-group" >
+                        #if($shiro.hasPermission("sys:user:save"))
+                            <button type="button" class="btn btn-default" onclick="load('sys/user_add.vm');">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+                            </button>
+                         #end
+                        </div>
+                        <table id="tb_content"></table>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Panel Other -->
+</div>
+
+<div style="display: none;padding:10px;" id="roleLayer">
+        <div class="col-xs-2" style="width:45%">
+            <select multiple class="form-control" style="height: 200px" id="roleall">
+
+            </select>
+            <h6>全部角色</h6>
+        </div>
+        <div class="col-xs-1" style="text-align: center;margin-top: 100px;width: 10%">
+            <i class="fa fa-exchange" aria-hidden="true"></i>
+        </div>
+        <div class="col-xs-2" style="width:45%;">
+            <select multiple class="form-control"  style="height:200px" id="role">
+            </select>
+            <h6>拥有角色</h6>
+        </div>
+</div>
+<!-- 全局js -->
+<script src="$rc.contextPath/statics/js/jquery.min.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.js"></script>
+
+<!-- Bootstrap table -->
+<script src="$rc.contextPath/statics/plugins/bootstrap-table/js/bootstrap-table.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<script src="$rc.contextPath/statics/js/tableIndex.js"></script>
+<!-- Sweet alert -->
+<script src="$rc.contextPath/statics/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="$rc.contextPath/statics/plugins/layer/layer.js"></script>
+<script>
+    $("#roleall").on('click',function(){
+        $("#role").append($('#roleall option:selected').removeAttr("selected")[0]);
+    })
+    $("#role").on('click',function(){
+        $("#roleall").append($('#role option:selected').removeAttr("selected")[0]);
+    })
+
+    jQuery.ajax({
+        type: "GET",
+        url: "$rc.contextPath/sys/user/drop",
+        success: function (result) {
+            if (result.code == 0) {
+                var company = result.company;
+                for (var i = 0; i < company.length; i++) {
+                    $("#company").append("<option value='" + company[i].id + "'>" + company[i].name + "</option>");
+                }
+            } else {
+                swal("错误", result.msg, "error");
+            }
+        }
+    })
+    $(function() {
+        //1. 定义表格列
+        var columns = [{
+            field: 'username',
+            title: '用户名'
+        }, {
+            field: 'nickname',
+            title: '姓名'
+        }, {
+            field: 'type',
+            title: '类型',
+            formatter:function (value,row,index) {
+                var data = new Array(
+                        '<span class="label label-danger">运维用户</span>',
+                        '<span class="label label-primary">服务商用户</span>',
+                        '<span class="label label-success">企业用户</span>');
+                return data[value-1];
+            }
+        }, {
+            field: 'company',
+            title: '所属企业'
+        }, {
+            field: 'provider',
+            title: '所属服务商'
+        }, {
+            field: 'isDelete',
+            title: '状态',
+            formatter:function (value,row,index) {
+                var data = new Array(
+                        '<span class="label label-danger">禁用</span>',
+                        '<span class="label label-success">启用</span>'
+                        );
+                return data[value];
+            }
+        }, {
+            field: 'rootname',
+            title: '操作',
+            formatter:function (value,row,index) {
+                return [
+                    '<a class="btn btn-info" onclick="toRole('+row.id+')"><i class="fa fa-wrench"> </i> 权限配置</a> ',
+                    '<a class="btn btn-info" onclick="load(\'sys/user_edit.vm?id=\'+'+row.id+')"><i class="fa fa-paste"> </i> 编辑</a> '
+                    #if($shiro.hasPermission("sys:user:delete"))
+                        ,row.isDelete?'<a class="btn btn-danger" onclick="delOrUse('+row.id+','+row.isDelete+')"><i class="fa fa-trash-o"> </i> 禁用</a> ':'<a class="btn btn-success" onclick="delOrUse('+row.id+','+row.isDelete+')"><i class="fa fa-check-circle-o"> </i> 启用</a> '
+                    #end
+                ].join('');
+            }
+        }
+        ];
+        //2.初始化Table
+        var  oTable = new TableInit('$rc.contextPath/sys/user/list',columns);
+        oTable.Init();
+    })
+
+    function GetQueryParams() {
+        //以下参数，为各具体功能根据查询条件进行修改
+        //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        var temp = {
+            username: $("#username").val(),
+            nickname: $("#nickname").val(),
+            type:$("#type").val(),
+            companyId:$("#company option:selected").val()
+        };
+        return temp;
+    }
+
+    function load(url) {
+        var name = window.name;
+        var f = parent.document.getElementsByName(name)[0];
+        $(f).attr("src",url);
+    }
+
+    function delOrUse(id,value) {
+        jQuery.ajax({
+            type: "POST",
+            url: value?("$rc.contextPath/sys/user/delete/"+id):("$rc.contextPath/sys/user/use/"+id),
+            dataType: "json",
+            success: function(result){
+                if(result.code == 0){//返回成功
+                    var char = value?'禁用':'启用';
+                    swal("执行成功",'您已经'+char+'该用户',"success" );
+                    $("#tb_content").bootstrapTable('refresh');
+                }else{
+                    swal("错误",result.msg,"error" );
+                }
+            }
+        });
+    }
+    function toRole(id) {
+        jQuery.ajax({
+            url:"$rc.contextPath/sys/role/authorization/"+id,
+            type:"GET",
+            dataType:"json",
+            success:function (result) {
+                if(result.code==0){
+                    console.log(result)
+                    $("#roleall").html('');
+                    $("#role").html('');
+                    result.all.map(function (item,idex) {
+                        $("#roleall").append('<option style="cursor:pointer;" value="'+item.roleId+'">'+item.roleName+'</option>');
+                    })
+                    result.roleList.map(function (item,idex) {
+                        $("#role").append('<option style="cursor:pointer;" value="'+item.roleId+'">'+item.roleName+'</option>');
+                    })
+                }
+            }
+        })
+        layer.open({
+            type: 1,
+            offset: '50px',
+            skin: 'layui-layer-molv',
+            title: "选择角色",
+            area: ['400px', '360px'],
+            shade: 0,
+            shadeClose: false,
+            content: jQuery("#roleLayer"),
+            btn: ['确定', '取消'],
+            btn1: function (index) {
+                var array = new Array();  //定义数组     
+                 $("#role option").each(function(){ 
+                     //遍历所有option         
+                      var txt = $(this).val();  
+                     // 获取option值          
+                     if(txt!=''){             
+                       array.push(txt); 
+                     // 添加到数组中         
+                     }    
+                 })
+                console.log(array)
+                jQuery.ajax({
+                    type: "POST",
+                    url: "$rc.contextPath/sys/role/auth/"+id,
+                    dataType: "json",
+                    data: JSON.stringify(array),
+                    contentType: "application/json;charset=UTF-8",
+                    success: function(result){
+                        if(result.code == 0){//返回成功
+                            swal("操作成功","", "success");
+                        }else{
+                            swal("错误",result.msg,"error" );
+                        }
+                    }
+                });
+                layer.close(index);
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>

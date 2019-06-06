@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>H+ 后台主题UI框架 - Bootstrap Table</title>
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link href="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/plugins/bootstrap-table/css/bootstrap-table.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/style.css" rel="stylesheet">
+    <link href="$rc.contextPath/statics/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Sweet Alert -->
+    <link href="$rc.contextPath/statics/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+
+    <link href="$rc.contextPath/statics/plugins/ztree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
+
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-2 well" style="overflow:hidden;text-overflow:ellipsis;">
+            <ul id="treeDemo" class="ztree"></ul>
+        </div>
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>查询</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">设备名</label>
+                                <input type="text" id="name" class="form-control" placeholder="设备名">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">设备类型</label>
+                                <select class="form-control" id="type">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <button type="button" onclick="Query()" class="btn btn-primary" style="margin-top: 25px !important;">
+                                <i class="fa fa-search"></i>
+                                搜索
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Panel Other -->
+            <div class="ibox float-e-margins">
+
+                <div class="ibox-content">
+                    <div class="row row-lg">
+
+                        <div class="col-sm-12">
+                            <!-- Example Events -->
+                            <div class="example-wrap">
+                                <div id="toolbar" class="btn-group" >
+                                    #if($shiro.hasPermission("sys:device:save"))
+                                        <button type="button" class="btn btn-default" onclick="load('sys/eq_add.vm');">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+                                        </button>
+                                    #end
+                                </div>
+
+                                <table id="tb_content"></table>
+                            </div>
+                            <!-- End Example Events -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Panel Other -->
+        </div>
+        </div>
+    </div>
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    设备运行记录
+                </h4>
+            </div>
+            <div class="modal-body">
+                <table id="tb_run"></table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<!-- 全局js -->
+<script src="$rc.contextPath/statics/js/jquery.min.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap/bootstrap.min.js"></script>
+
+<!-- Bootstrap table -->
+<script src="$rc.contextPath/statics/plugins/bootstrap-table/js/bootstrap-table.js"></script>
+<script src="$rc.contextPath/statics/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<script src="$rc.contextPath/statics/js/tableIndex.js"></script>
+<!-- Sweet alert -->
+<script src="$rc.contextPath/statics/plugins/sweetalert/sweetalert.min.js"></script>
+
+<script src="$rc.contextPath/statics/plugins/ztree/jquery.ztree.all.min.js"></script>
+<script>
+    $(function() {
+        //1. 定义表格列
+        var columns = [{
+            field: 'code',
+            title: '编号'
+        },{
+            field: 'name',
+            title: '设备名称'
+        }, {
+            field: 'isOnline',
+            title: '设备状态',
+            formatter:function (value,row,index) {
+                var data = new Array(
+                        '<span class="label label-danger">离线</span>',
+                        '<span class="label label-primary">在线</span>')
+                return data[value];
+            }
+        }, {
+            field: 'typeName',
+            title: '设备类型',
+        }, {
+            field: 'comName',
+            title: '所属企业'
+        },{
+            field: 'isDelete',
+            title: '状态',
+            formatter:function (value,row,index) {
+                // alert(value);
+                var data = new Array(
+                        '<span class="label label-danger">禁用</span>',
+                        '<span class="label label-success">启用</span>')
+                return data[value];
+            }
+        },
+        #if($shiro.hasPermission("sys:device:update"))
+            {
+            field: 'rootname',
+            title: '操作',
+            formatter:function (value,row,index) {
+                return [
+                    '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>运行记录</a> ',
+                    #if($shiro.hasPermission("sys:device:update"))
+                        '<a class="btn btn-info" onclick="load(\'sys/eq_edit.vm?id=\'+\''+row.code+'\')"><i class="fa fa-paste"> </i> 编辑</a> '
+                    #end
+                    #if($shiro.hasPermission("sys:device:delete"))
+                        ,row.isDelete?'<a class="btn btn-danger" onclick="modify(\''+row.code+'\','+row.isDelete+')"><i class="fa fa-trash-o"> </i> 禁用</a> ':'<a class="btn btn-success" onclick="modify(\''+row.code+'\','+row.isDelete+')"><i class="fa fa-check-circle-o"> </i> 启用</a> '
+                    #end
+                ].join('');
+            }
+        }
+        #end
+        ];
+        //2.初始化Table
+        var  oTable = new TableInit('$rc.contextPath/sys/eq/list',columns);
+        oTable.Init();
+    })
+
+
+    function GetQueryParams() {
+        //以下参数，为各具体功能根据查询条件进行修改
+        //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+        var temp = {
+            name:$("#name").val(),
+            type:$("#type").val()
+        };
+        return temp;
+    }
+
+    function load(url) {
+        var name = window.name;
+        var f = parent.document.getElementsByName(name)[0];
+        $(f).attr("src",url);
+    }
+
+    function modify(code,isDelete) {
+        jQuery.ajax({
+            type: "POST",
+            url: "$rc.contextPath/sys/eq/modify/"+code+"/"+isDelete,
+            dataType: "json",
+            success: function(result){
+                if(result.code == 0){//返回成功
+                    var msg = isDelete?"禁用":"启用";
+                    swal("执行成功",'您已经'+msg+'该设备',"success" );
+                    $("#tb_content").bootstrapTable('refresh');
+                }else{
+                    swal("错误",result.msg,"error" );
+                }
+            }
+        });
+    }
+    function show_modal(code){
+        $('#myModal').modal('show');
+        $('#tb_run').bootstrapTable('destroy');
+        //表格初始化函数，相当于构造函数
+        var TableInit = function (url,columns) {
+            var oTableInit = new Object();
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#tb_run').bootstrapTable({
+                    url: url,//请求后台的URL（*）
+                    method: 'post',//请求方式（*）
+                    striped: true,//是否显示行间隔色
+                    cache: false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,//是否显示分页（*）
+                    sortable: false,//是否启用排序
+                    sortOrder: "asc",//默认排序方式
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "server",//分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber:1,//初始化加载第一页，默认第一页
+                    pageSize: 4,//每页的记录行数（*）
+                    search: false,//是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    strictSearch: false,
+                    showColumns: false,//是否显示所有的列
+                    showRefresh: false,//是否显示刷新按钮
+                    minimumCountColumns: 2,//最少允许的列数
+                    clickToSelect: true, //是否启用点击选中行
+                    /*height: 500,*///行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "id",//每一行的唯一标识，一般为主键列
+                    showToggle:false,//是否显示详细视图和列表视图的切换按钮
+                    cardView: false,//是否显示详细视图
+                    detailView: false,//是否显示父子表
+                    columns: columns //填充数据
+                });
+                /* Query();*/
+            };
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                var temp = GetQueryParams();
+                temp["limit"] = params.limit;   //页面大小
+                temp["offset"] = params.offset;  //开始记录数
+                temp["code"] = code;
+                return temp;
+            };
+            return oTableInit;
+        };
+        //1. 定义表格列
+        var columns = [{
+            field: 'info',
+            title: '运行内容',
+            formatter:function (value,row,index) {
+                var dataObj=eval("("+value+")");
+                return dataObj.msg;
+            }
+
+        },{
+            field: 'type',
+            title: '内容类型',
+            formatter:function (value,row,index) {
+                var data = new Array(
+                        '<span class="label label-danger">告警</span>',
+                        '<span class="label label-success">正常</span>')
+                return data[value];
+            }
+        },{
+            field: 'createTime',
+            title: '运行时间',
+            formatter:function (value,row,index) {
+                return timestampToTime(value);
+            }
+
+        }
+        ];
+        //2.初始化Table
+        var  oTable = new TableInit('$rc.contextPath/sys/eq/info',columns);
+        oTable.Init();
+    }
+    function timestampToTime(timestamp) {
+        var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = date.getDate() < 10 ?  '0'+date.getDate()+ ' ' : date.getDate()+ ' ';
+        var h = date.getHours() < 10 ? '0'+date.getHours()+ ':' : date.getHours()+ ':';
+        var m = date.getMinutes() < 10 ? '0'+date.getMinutes()+ ':' : date.getMinutes()+ ':';
+        var s = date.getSeconds()< 10 ? '0'+date.getSeconds() : date.getSeconds();
+        return Y+M+D+h+m+s;
+    }
+</script>
+
+<script>
+    //加载类型
+    url = '$rc.contextPath/sys/type/list';
+    jQuery.ajax({
+        url:url,
+        async:false,
+        success:function (pdata) {
+            var html = "";
+            jQuery.each(pdata,function(idx,item){
+                html += "<option value='" + item.id + "' exid='" + item.id + "'>" + item.name + "</option>";
+            });
+            $("#type").append(html);
+        }
+    })
+    jQuery.ajax({
+        type: "GET",
+        url: "$rc.contextPath/sys/provider/ztree",
+        success: function (result) {
+            if (result.code == 0) {
+                var setting = {
+                    callback: {
+                        onClick: onClick
+                    }
+                };
+                $(document).ready(function(){
+                    jQuery.fn.zTree.init($("#treeDemo"), setting, result.data);
+                });
+            } else {
+                swal("错误", result.msg, "error");
+            }
+        }
+    })
+    function onClick(event, treeId, treeNode, clickFlag) {
+        $('#tb_content').bootstrapTable('destroy');
+        $(function() {
+            //1. 定义表格列
+            var columns = [{
+                field: 'code',
+                title: '编号1'
+            },{
+                field: 'name',
+                title: '设备名称'
+            }, {
+                field: 'isOnline',
+                title: '设备状态',
+                formatter:function (value,row,index) {
+                    var data = new Array(
+                            '<span class="label label-danger">离线</span>',
+                            '<span class="label label-primary">在线</span>')
+                    return data[value];
+                }
+            }, {
+                field: 'type',
+                title: '设备类型',
+                formatter:function (value,row,index) {
+                    var data = new Array(
+                            '<span class="label label-info">烟感</span>',
+                            '<span class="label label-info">其他</span>')
+                    return data[value];
+                }
+            }, {
+                field: 'comName',
+                title: '所属企业'
+            },{
+                field: 'isDelete',
+                title: '状态',
+                formatter:function (value,row,index) {
+                    // alert(value);
+                    var data = new Array(
+                            '<span class="label label-danger">禁用</span>',
+                            '<span class="label label-success">启用</span>')
+                    return data[value];
+                }
+            },
+                #if($shiro.hasPermission("sys:device:update"))
+                    {
+                        field: 'rootname',
+                        title: '操作',
+                        formatter:function (value,row,index) {
+                            return [
+                                '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>运行记录</a> ',
+                                #if($shiro.hasPermission("sys:device:update"))
+                                    '<a class="btn btn-info" onclick="load(\'sys/eq_edit.vm?id=\'+\''+row.code+'\')"><i class="fa fa-paste"> </i> 编辑</a> '
+                                #end
+                                #if($shiro.hasPermission("sys:device:delete"))
+                                    ,row.isDelete?'<a class="btn btn-danger" onclick="modify(\''+row.code+'\','+row.isDelete+')"><i class="fa fa-trash-o"> </i> 禁用</a> ':'<a class="btn btn-success" onclick="modify(\''+row.code+'\','+row.isDelete+')"><i class="fa fa-check-circle-o"> </i> 启用</a> '
+                                #end
+                            ].join('');
+                        }
+                    }
+                #end
+            ];
+            //2.初始化Table
+            var  oTable = new TableInit(treeNode.isParent?('$rc.contextPath/sys/eq/list/a/'+treeNode.id):('$rc.contextPath/sys/eq/list/'+treeNode.id),columns);
+            oTable.Init();
+        })
+    }
+
+</script>
+</body>
+
+</html>
