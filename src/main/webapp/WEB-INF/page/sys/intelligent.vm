@@ -129,7 +129,6 @@
             async:false,
             success: function (result) {
                 if (result.code == 0) {
-                    console.log(result)
                     $("#jkd").html(result.jkd+"个")
                     $("#yhd").html(result.yhd+"个")
                     data=result.data.rows;

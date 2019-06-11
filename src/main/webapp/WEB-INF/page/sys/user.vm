@@ -238,7 +238,6 @@
             dataType:"json",
             success:function (result) {
                 if(result.code==0){
-                    console.log(result)
                     $("#roleall").html('');
                     $("#role").html('');
                     result.all.map(function (item,idex) {
@@ -271,7 +270,6 @@
                      // 添加到数组中         
                      }    
                  })
-                console.log(array)
                 jQuery.ajax({
                     type: "POST",
                     url: "$rc.contextPath/sys/role/auth/"+id,

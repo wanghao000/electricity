@@ -118,7 +118,6 @@
         type: "GET",
         url: "$rc.contextPath/sys/user/drop",
         success: function (result) {
-            console.log(result);
             if (result.code == 0) {
                 var company = result.company;
                 var provider = result.provider;

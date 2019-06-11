@@ -202,7 +202,6 @@
             dataType: "json",
             success: function (result) {
                 if (result.code == 0) {
-                    console.log(result.info)
                     $("#company_name").text(result.info.company.name);
                     $("#company_address").text(result.info.company.address);
                     $("#company_code").text(result.info.company.code);
@@ -232,7 +231,7 @@
                     }
 
                 } else {
-                    console.log(result)
+                    swal("错误",result.msg,"error" );
                 }
             }
         })

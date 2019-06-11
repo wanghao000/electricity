@@ -20,4 +20,14 @@ public class SysChinaServiceImpl implements SysChinaService {
         return mapper.selectByParentid(parentid);
     }
 
+    @Override
+    public List<SysChina> findProvinces() {
+        return mapper.findProvinces();
+    }
+
+    @Override
+    public List<SysChina> findProvincesByProvider(Long id) {
+        return mapper.findProvincesByProvider(id);
+    }
+
 }

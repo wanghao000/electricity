@@ -9,4 +9,12 @@
     <select id="selectByParentid" resultType="cn.hz.fcloud.entity.SysChina">
         select * from sys_china where parent_id = #{parentid}
     </select>
+
+    <select id="findProvinces" resultType="cn.hz.fcloud.entity.SysChina">
+        SELECT id,name FROM sys_china WHERE id in(SELECT DISTINCT(province) FROM company)
+    </select>
+
+    <select id="findProvincesByProvider" parameterType="Long" resultType="cn.hz.fcloud.entity.SysChina">
+        SELECT id,name FROM sys_china WHERE id in(SELECT DISTINCT(province) FROM company WHERE provider_id = #{id})
+    </select>
 </mapper>

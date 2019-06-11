@@ -164,7 +164,6 @@
             async:false,
             success:function (result) {
                 if(result.code == 0){
-                    console.log(result.info)
                     $("#alarmCount").text(result.info.alarmCount);
                     $("#lineCount").text(result.info.lineCount);
                     $("#companyCount").text(result.info.companyCount);
@@ -193,7 +192,7 @@
                         }
                     }
                 }else{
-                    console.log(result)
+                    swal("错误",result.msg,"error" );
                 }
             }
         })

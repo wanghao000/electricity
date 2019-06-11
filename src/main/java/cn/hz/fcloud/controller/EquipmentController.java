@@ -1,16 +1,7 @@
 package cn.hz.fcloud.controller;
 
-import cn.hz.fcloud.entity.Company;
-import cn.hz.fcloud.entity.Eq;
-import cn.hz.fcloud.entity.EqInfos;
-import cn.hz.fcloud.entity.Equipment;
-import cn.hz.fcloud.entity.EquipmentData;
-import cn.hz.fcloud.entity.SysUser;
-import cn.hz.fcloud.service.CompanyService;
-import cn.hz.fcloud.service.EqInfosService;
-import cn.hz.fcloud.service.EqService;
-import cn.hz.fcloud.service.EquipmentDataService;
-import cn.hz.fcloud.service.EquipmentService;
+import cn.hz.fcloud.entity.*;
+import cn.hz.fcloud.service.*;
 import cn.hz.fcloud.utils.R;
 import cn.hz.fcloud.utils.ShiroUtil;
 import cn.hz.fcloud.utils.TableReturn;
@@ -41,8 +32,10 @@ public class EquipmentController {
     private CompanyService comService;
     @Autowired
     private EqInfosService EqInfosService;
+//    @Autowired
+//    private EquipmentDataService alarmService;
     @Autowired
-    private EquipmentDataService eqdataService;
+    private AlarmService alarmService;
     @Autowired
     private EqService eqService;
 
@@ -188,9 +181,9 @@ public class EquipmentController {
         List<Map<String, Object>> alarmEquipmentAndCount;
         SysUser user = ShiroUtil.getUserEntity();
         if (user.getType() == 1) {
-            alarmEquipmentAndCount = eqdataService.findAlarmEquipmentAndCount();
+            alarmEquipmentAndCount = alarmService.findAlarmEquipmentAndCount();
         } else {
-            alarmEquipmentAndCount = eqdataService.findAlarmEquipmentAndCountByUser(user.getId());
+            alarmEquipmentAndCount = alarmService.findAlarmEquipmentAndCountByUser(user.getId());
         }
         for (Map<String, Object> map : alarmEquipmentAndCount) {
             if("0".equals(String.valueOf(map.get("type")))) {
@@ -242,9 +235,9 @@ public class EquipmentController {
         SysUser user = ShiroUtil.getUserEntity();
         List<Map<String, Object>> companyAlarmCount;
         if(user.getType() == 1) {
-            companyAlarmCount = eqdataService.findCompanyAlarmCount();
+            companyAlarmCount = alarmService.findCompanyAlarmCount();
         } else {
-            companyAlarmCount = eqdataService.findCompanyAlarmCountByUser(user.getId());
+            companyAlarmCount = alarmService.findCompanyAlarmCountByUser(user.getId());
         }
         for (Map<String, Object> map : companyAlarmCount) {
             name.add(map.get("name"));
@@ -268,9 +261,9 @@ public class EquipmentController {
         SysUser user = ShiroUtil.getUserEntity();
         List<Map<String, Object>> companyAlarmCount;
         if(user.getType() == 1) {
-            companyAlarmCount = eqdataService.find7dayAlarmCount();
+            companyAlarmCount = alarmService.find7dayAlarmCount();
         } else {
-            companyAlarmCount = eqdataService.find7dayAlarmCountByUser(user.getId());
+            companyAlarmCount = alarmService.find7dayAlarmCountByUser(user.getId());
         }
         for (Map<String, Object> map : companyAlarmCount) {
             date.add(map.get("dfc"));
@@ -289,7 +282,7 @@ public class EquipmentController {
     @ResponseBody
     public List<Map<String, Object>> recent5Record(){
         SysUser user = ShiroUtil.getUserEntity();
-        return user.getType() == 1?eqdataService.recent5Record():eqdataService.recent5RecordByUser(user.getId());
+        return user.getType() == 1?alarmService.recent5Record():alarmService.recent5RecordByUser(user.getId());
     }
 
     /**
@@ -300,14 +293,14 @@ public class EquipmentController {
     @ResponseBody
     public List<Map<String, Object>> findAreaAlarmCount(){
         SysUser user = ShiroUtil.getUserEntity();
-        return user.getType() == 1?eqdataService.findAreaAlarmCount():eqdataService.findAreaAlarmCountByUser(user.getId());
+        return user.getType() == 1?alarmService.findAreaAlarmCount():alarmService.findAreaAlarmCountByUser(user.getId());
     }
 
     @ResponseBody
     @RequestMapping("/info")
     public TableReturn info(@RequestBody Map<String,Object> map){
-        List<EquipmentData> data = eqdataService.getInfoByCode(map);
-        return new TableReturn(data,eqdataService.getInfoCount(map));
+        List<Alarm> data = alarmService.selectByCode(map);
+        return new TableReturn(data,alarmService.selectByCodeCount(map));
     }
 
     @RequestMapping("/znfx")
@@ -324,7 +317,7 @@ public class EquipmentController {
     public List<Equipment> alarmDevice(List<Equipment> equipmentList){
         List<Equipment> datas = new ArrayList<>();
         for(Equipment eq:equipmentList){
-            if(eqdataService.geetAlarmCountByCode(eq.getCode())>0){
+            if(alarmService.alarmCountByCode(eq.getCode())>0){
                 datas.add(eq);
             }
         }

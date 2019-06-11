@@ -121,7 +121,7 @@
                 if (result.code == 0) {
                     ztree = jQuery.fn.zTree.init($("#menuTree"), setting,result.menuList);
                 } else {
-                    console.log(result)
+                    swal("错误",result.msg,"error" );
                 }
             }
         })

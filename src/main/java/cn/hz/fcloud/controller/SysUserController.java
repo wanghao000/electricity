@@ -120,7 +120,6 @@ public class SysUserController {
     @RequestMapping("/modify")
     public R modify(String oldpwd,String newpwd){
         SysUser sysUser = ShiroUtil.getUserEntity();
-//        SimpleHash pwd = new SimpleHash("MD5",sysUser.getPassword(), ByteSource.Util.bytes(sysUser.getNickname()),1024);
         SimpleHash old = new SimpleHash("MD5",oldpwd, ByteSource.Util.bytes(sysUser.getUsername()),1024);
         if(!sysUser.getPassword().equals(old.toString())){
             throw new ServiceException("原密码输入错误!");

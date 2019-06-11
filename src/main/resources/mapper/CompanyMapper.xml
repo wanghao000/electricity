@@ -247,4 +247,10 @@
   <select id="findCompanyByName" resultType="cn.hz.fcloud.entity.Company">
        select * from company where name = #{name}
   </select>
+  <select id="findConpanyByProvince" resultType="cn.hz.fcloud.entity.Company">
+      select * from company where province = #{province}
+      <if test="provider_id != 0">
+         and provider_id = #{provider_id}
+      </if>
+  </select>
 </mapper>

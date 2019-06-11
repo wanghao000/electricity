@@ -256,7 +256,7 @@ function echarts_2(data) {
 function echarts_31(data){
     $("#fb1").append("<table id='alarm' width="+$('#fb1').width()+" style='table-layout: fixed;'><tr><td style='color: red;text-align: center;'>设备编号</td><td style='color: red;text-align: center;'>地点</td><td style='color: red;text-align: center;'>类型</td><td style='color: red;text-align: center;'>时间</td></tr>");
     for (var i = 0; i < data.length; i++) {
-        $("#alarm").append("<tr><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+data[i].code+"'>"+data[i].code+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+data[i].address+"'>"+/*data[i].merger_short_name+","+*/data[i].address+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+JSON.parse(data[i].info).msg+"'>"+JSON.parse(data[i].info).msg+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+JSON.parse(data[i].info).datetime+"'>"+JSON.parse(data[i].info).datetime+"</td></tr>");
+        $("#alarm").append("<tr><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+data[i].code+"'>"+data[i].code+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+data[i].address+"'>"+/*data[i].merger_short_name+","+*/data[i].address+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+JSON.parse(data[i].info).msg+"'>"+JSON.parse(data[i].info).msg+"</td><td style='color: red;text-align: center;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;width: 81px;' title='"+formateTime(JSON.parse(data[i].info).datetime)+"'>"+formateTime(JSON.parse(data[i].info).datetime)+"</td></tr>");
     }
     $("#fb1").append("</table>");
 }
@@ -399,6 +399,19 @@ function echarts_6(data) {
         window.addEventListener("resize",function(){
             myChart.resize();
         });
+    }
+     //时间格式转换  190201150230转换为2019-02-01 15:02.30
+    function formateTime(timestamp) {
+    if(timestamp != undefined && timestamp != null){
+        var Y = timestamp.substring(0,2);
+        var M = timestamp.substring(2,4);
+        var D = timestamp.substring(4,6);
+        var h = timestamp.substring(6,8);
+        var m = timestamp.substring(8,10);
+        var s = timestamp.substring(10,12);
+        return "20"+Y+"-"+M+"-"+D+"   "+h+":"+m+":"+s;
+    }
+    return "--";
     }
 
 function echarts_4(data) {

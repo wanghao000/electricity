@@ -129,12 +129,11 @@
         async: false,
         success: function (result) {
             if (result.code == 0) {
-                // console.log(result.info)
                 $("#alarmCount").text(result.info.alarmCount);
                 $("#companyCount").text(result.info.companyCount);
                 $("#equipmentCount").text(result.info.equipmentCount);
             } else {
-                console.log(result)
+                swal("错误",result.msg,"error" );
             }
         }
     })
@@ -214,7 +213,6 @@
            var input = $(".in").val();
 
             var array = data.rows;
-            console.log(array);
             var newarray = new Array();
             for(var i=0;i<array.length;i++){
                 var obj = array[i];

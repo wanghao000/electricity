@@ -141,4 +141,8 @@ public class CompanyController {
         user = ShiroUtil.getUserEntity();
         return eqService.findByComId(user.getCompanyId());
     }
+
+    public List<Company> findCompanysByProvince(){
+        return null;
+    }
 }

@@ -101,7 +101,7 @@
                     &times;
                 </button>
                 <h4 class="modal-title" id="myModalLabel">
-                    设备运行记录
+                    设备告警记录
                 </h4>
             </div>
             <div class="modal-body">
@@ -167,7 +167,7 @@
             title: '操作',
             formatter:function (value,row,index) {
                 return [
-                    '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>运行记录</a> ',
+                    '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>告警记录</a> ',
                     #if($shiro.hasPermission("sys:device:update"))
                         '<a class="btn btn-info" onclick="load(\'sys/eq_edit.vm?id=\'+\''+row.code+'\')"><i class="fa fa-paste"> </i> 编辑</a> '
                     #end
@@ -265,7 +265,7 @@
         //1. 定义表格列
         var columns = [{
             field: 'info',
-            title: '运行内容',
+            title: '告警内容',
             formatter:function (value,row,index) {
                 var dataObj=eval("("+value+")");
                 return dataObj.msg;
@@ -282,7 +282,7 @@
             }
         },{
             field: 'createTime',
-            title: '运行时间',
+            title: '告警时间',
             formatter:function (value,row,index) {
                 return timestampToTime(value);
             }
@@ -385,7 +385,7 @@
                         title: '操作',
                         formatter:function (value,row,index) {
                             return [
-                                '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>运行记录</a> ',
+                                '<a class="btn btn-primary" onclick="show_modal(\''+row.code+'\')"><i class="fa fa-search"></i>告警记录</a> ',
                                 #if($shiro.hasPermission("sys:device:update"))
                                     '<a class="btn btn-info" onclick="load(\'sys/eq_edit.vm?id=\'+\''+row.code+'\')"><i class="fa fa-paste"> </i> 编辑</a> '
                                 #end

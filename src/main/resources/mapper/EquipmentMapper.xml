@@ -33,10 +33,6 @@
     <select id="selectByCompanyId" resultType="cn.hz.fcloud.entity.Equipment">
         select * from equipment where company_id = #{value}
     </select>
-    <select id="test" resultType="cn.hz.fcloud.entity.Equipment">
-        SELECT e.*,d.* FROM equipment e
-		LEFT JOIN equipment_data d ON e.code=d.code
-    </select>
     <update id="updateEq" parameterType="cn.hz.fcloud.entity.Equipment">
         update equipment
         <set>

@@ -95,6 +95,7 @@
 <!-- layer -->
 <script src="$rc.contextPath/statics/plugins/layer/layer.js"></script>
 
+
 <script>
     $(function() {
         //1. 定义表格列
@@ -190,6 +191,8 @@
             }
         });
     }
+
+    //时间戳转换
     function timestampToTime(timestamp) {
         var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
         var Y = date.getFullYear() + '-';
@@ -204,18 +207,7 @@
     function loadImg (value){
         $('#myModal').modal('show');
         $("#CompanyImg").attr("src","/upload"+value);
-        // window.open("/upload"+value);
-            // layer.open({
-            //     type: 1,
-            //     title: false,
-            //     closeBtn: 0,
-            //     shadow:0,
-            //     area:'700px',
-            //     skin: 'layui-layer-nobg', //没有背景色
-            //     shadeClose: true,
-            //     content: '<img src="/upload'+value+'">'
-            // })
-        }
+    }
 </script>
 
 </body>

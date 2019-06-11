@@ -1,5 +1,6 @@
 package cn.hz.fcloud.dao;
 
+import cn.hz.fcloud.entity.Company;
 import cn.hz.fcloud.entity.Provider;
 import cn.hz.fcloud.entity.SysChina;
 import cn.hz.fcloud.entity.SysUser;
@@ -31,10 +32,14 @@ public class TestSysChinaMapper {
     private ProviderMapper providerMapper;
     @Test
     public void sysChinaTest(){
-        List<SysChina> list = chinaMapper.selectByParentid(100000);
-        for(SysChina china : list){
-            System.out.println(china.getMerger_short_name());
-        }
+        List<SysChina> list = chinaMapper.findProvinces();
+        list.forEach(item->{
+            System.out.println(item.toString());
+        });
+        List<SysChina> sysChinaList = chinaMapper.findProvincesByProvider(new Long(1));
+        sysChinaList.forEach(item->{
+            System.out.println(item.toString());
+        });
     }
     @Test
     public void equipmentTest(){
@@ -47,12 +52,10 @@ public class TestSysChinaMapper {
 
     @Test
     public void companyTest(){
-       /* List<Company> coms = comMapper.findAllCompanys();
-        for(Company com:coms){
-            System.out.println(com);
-        }*/
-       System.out.println(comMapper.findCompanyCode());
-        String s = String.format("%05d", 25);
+       List<Company> list = comMapper.findConpanyByProvince(370000+"",new Long(0));
+       list.forEach(item->{
+           System.out.println(item.toString());
+       });
     }
 
     @Test
@@ -78,10 +81,21 @@ public class TestSysChinaMapper {
 //        for(Provider pro : list){
 //            System.out.println(pro);
 //        }
-        Provider provider = providerMapper.selectByPrimaryKey(new Long(1));
-        provider.setAddress("浙江");
-        providerMapper.updateByPrimaryKeySelective(provider);
-        System.out.println(provider);
+//        Provider provider = providerMapper.selectByPrimaryKey(new Long(1));
+//        provider.setAddress("浙江");
+//        providerMapper.updateByPrimaryKeySelective(provider);
+//        System.out.println(provider);
+
+        String code = providerMapper.findProviderCode();
+        String newCode = "";
+        if(code != "" && code != null){
+            int temp = Integer.valueOf(code.split("B")[1])+1;
+            String s = String.format("%05d", temp);
+            newCode = "B"+s;
+        }else{
+            newCode = "B00001";
+        }
+        System.out.println(newCode);
     }
 //    public void syso(List<Enum> list){
 //        for(Object obj:list){

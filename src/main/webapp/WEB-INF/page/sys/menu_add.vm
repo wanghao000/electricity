@@ -182,7 +182,7 @@
                     var node = ztree.getNodeByParam("menuId", 0);
                     ztree.selectNode(node);
                 } else {
-                    console.log(result)
+                    swal("错误",result.msg,"error" );
                 }
             }
         })

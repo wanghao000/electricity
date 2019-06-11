@@ -2,6 +2,8 @@ package cn.hz.fcloud.dao;
 
 import cn.hz.fcloud.entity.Company;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +43,14 @@ public interface CompanyMapper {
     Company findCompanyByName(String name);
 
     List<Company> selectComsByProId(Long id);
+
+    /**
+     * 根据选择的省份id获取对应角色下的公司信息 provider_id=0表示管理员角色
+     * @param province
+     * @param provider_id
+     * @return
+     */
+    List<Company> findConpanyByProvince(@Param("province") String province, @Param("provider_id") Long provider_id);
+
+    
 }

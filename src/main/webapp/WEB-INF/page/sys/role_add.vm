@@ -80,7 +80,7 @@
                 //展开所有节点
                 ztree.expandAll(true);
             } else {
-                console.log(result)
+                swal("错误",result.msg,"error" );
             }
         }
     })
