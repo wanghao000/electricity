@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.hz</groupId>
-    <artifactId>fcloud</artifactId>
+    <artifactId>electricity</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -148,12 +148,20 @@
             <artifactId>aspectj-tools</artifactId>
             <version>1.0.6</version>
         </dependency>
-    <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
-      <version>1.2.47</version>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.47</version>
+        </dependency>
+        <!-- 容联云通信 -->
+        <dependency>
+            <groupId>com.hz</groupId>
+            <artifactId>ronglian</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/lib/CCP_REST_SMS_SDK_JAVA_v2.6.3r.jar</systemPath>
+        </dependency>
+    </dependencies>
 
 
     <build>
